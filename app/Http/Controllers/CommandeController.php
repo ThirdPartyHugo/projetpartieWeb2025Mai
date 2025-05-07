@@ -146,9 +146,9 @@ class CommandeController extends Controller
                     $commandeProduits->qte = $qte;
 
 
-
                     if(!$commandeProduits->save())
                     {
+                        
                         throw new Exception("La sauvegarde de la transaction avec le produit no " + $produit_id + "a échouée");
                     }
                 }
@@ -163,12 +163,15 @@ class CommandeController extends Controller
                     throw new Exception("La sauvegarde de la transaction avec la methode de paiement no " + $content["payement_method"] + "a échouée");
                 }
             }
-            catch(QueryException $erreur)
-            {
-                return response()->json(['ERREUR' => 'Erreur critique à l\'insertion de la commande.\n
-                Transaction annulée.'], 500);
+            catch(Exception $erreur) {
                 $this->cancelTransaction($id);
+                return response()->json([
+                    'ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion. Transaction annulée.',
+                    'DETAIL' => $erreur->getMessage(),
+                    'TRACE' => $erreur->getTraceAsString()
+                ], 500);
             }
+            
             catch(Exception $erreur)
             {
                 return response()->json(['ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion.\n
