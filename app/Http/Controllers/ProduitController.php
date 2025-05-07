@@ -15,7 +15,7 @@ class ProduitController extends Controller
      */
     public function index(Request $request)
     {
-        return view('commande/afficherCommandes', [
+        return view('produit/produits', [
             'produits' => Produit::All()
         ]);
     }
