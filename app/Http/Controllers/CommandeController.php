@@ -69,8 +69,7 @@ class CommandeController extends Controller
     {
         $rawContent = $request->all();
 
-        if(gettype($rawContent["payement_method"] == "array"))
-        {
+        
 
 
             $insertCard = new ModePayementController;
@@ -84,7 +83,7 @@ class CommandeController extends Controller
             {
                 $rawContent["payement_method"] = 1;
             }
-        }
+        
 
         $validation = Validator::make($rawContent,
         [
