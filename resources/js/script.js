@@ -210,7 +210,7 @@ async function searchEmployee(motCle){
                 },
     };
 
-    let response = await fetch('https://projetpartieweb2025mai69-main-oppfil.laravel.cloud/api/searchEmploye?objet=employe&mots_cles=' + motCle, options)
+    let response = await fetch('http://localhost:8000/api/searchEmploye?objet=employe&mots_cles=' + motCle, options)
     /* La méthode json() ci-dessous (au lieu de text()) est nécessaire puisque
     le serveur répondra au format JSON tel que défini dans le champ "headers"
     ci-haut. */

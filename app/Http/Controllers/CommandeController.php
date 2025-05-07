@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use App\Models\Produit;
-use Error;
+use App\Models\Statut;
+use App\Models\User;
 
 class CommandeController extends Controller
 {
@@ -24,16 +25,19 @@ class CommandeController extends Controller
 
         if(is_null($commandes))
         {
-            return abort(404);
+            return abort(404, "Aucune commande enregistrée");
         }
 
 
-        if ($request->routeIs('commandes'))
+        if ($request->routeIs('commande.index'))
         {
             if (is_null($commandes))
             {
-                return abort(404);
+                return abort(404, "Aucune commande enregistée");
             }
+
+
+            $commandes = ModePayementUserCommande::all();
 
             return view("commande/listCommandes",
             [
@@ -187,9 +191,9 @@ class CommandeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)
+    public function show(Request $request, int $commande_id)
     {
-        $commande = Commande::find($request->input("commande_id"));
+        $commande = Commande::find($request->input($commande_id));
 
         if(is_null($commande))
         {
@@ -221,9 +225,13 @@ class CommandeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Commande $commande)
+    public function edit(Request $request )
     {
-        //
+        return view("commande/editCommande",
+        [
+            "commande" => Commande::find($request->input('commande_id')),
+            "statuts" => Statut::all()
+        ]);
     }
 
     /**
@@ -233,16 +241,12 @@ class CommandeController extends Controller
     {
         $validation = Validator::make($request->all(),
         [
-            "id" => "required",
-            "total" => "required",
-            "date" => "required",
-            "statut" => "required"
+            "commande_id" => "required",
+            "statut_id" => "required"
         ],
         [
-            "id.required" => "L'id de la commande est manquante",
-            "total.required" => "Veuillez entrer le total",
-            "date.required" => "La date de la commande est manquante",
-            "statut.required" => "Le statut de la commande est manquante"
+            "commande_id.required" => "Aucune commande n'a été selectionnée",
+            "statut_id.required" => "Le statut de la commande est manquante"
         ]);
 
         if($validation->fails())
@@ -254,11 +258,9 @@ class CommandeController extends Controller
             //c'est ok de l'enregistrer en clair ?
             $content = $validation->validated();
 
-            $commande = Commande::find($content["id"]);
+            $commande = Commande::find($content["commande_id"]);
 
-            $commande->commande_total = $content["total"];
-            $commande->commande_date = $content["date"];
-            $commande->statut_id = $content["statut"];
+            $commande->statut_id = $content["statut_id"];
 
             if($commande->save())
             {
@@ -269,7 +271,7 @@ class CommandeController extends Controller
                 session()->flash("erreur", "La modification de la commande n'a pas fonctionnée");
             }
 
-            //retourne une vue (confirmation ?)
+            return redirect()->route('commande.index');
         }
     }
 

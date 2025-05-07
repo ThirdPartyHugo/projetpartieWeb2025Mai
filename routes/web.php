@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MagasinController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\CommandeController;
@@ -37,6 +38,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/updateEmployee', 'update')->name('updateEmployee');
             Route::post('/deleteEmployee', 'delete')->name('deleteEmployee');
         });
+
+        Route::controller(MagasinController::class)->group(function () {
+            Route::get('/magasins', 'index')->name('magasins');
+        });
     });
 });
 
@@ -47,7 +52,11 @@ Route::controller(ProfileController::class)->group(function () {
 
 Route::controller(CommandeController::class)->group(function ()
 {
-    Route::get("/commandes", "index")->name("listCommandes");
+    Route::get("/commandes", "index")->name("commande.index");
+    //Route::get("/commande/{id}","show")->name("commande.show");
+    Route::get("/commande/edit/", "edit")->name("commande.edit");
+    Route::post("/commande/update", "update")->name("commande.update");
+    Route::post("/commande/delete", "destroy")->name("commande.destroy");
 });
 
 require __DIR__.'/auth.php';

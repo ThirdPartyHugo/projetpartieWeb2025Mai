@@ -16,4 +16,9 @@ class Commande extends Model
 
     public $timestamps = false;
 
+    public function statut(): BelongsTo
+    {
+        return $this->belongsTo(Statut::class, 'statut_id', 'statut_id');
+    }
+
 }

@@ -6,7 +6,7 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
-if (window.location.pathname == '/produits') {
+if (window.location.pathname == '/produits' || window.location.pathname == '/enregistrementProduits') {
     document.getElementById("btnSupprimer").addEventListener("click", supProducts);
     document.getElementById("btnFiltre").addEventListener("click", filtreTexte);
     document.getElementById("btnEffacer").addEventListener("click", effacerFiltre);

@@ -39,15 +39,8 @@ Route::controller(ProfileController::class)->group(function(){
 
 Route::controller(CommandeController::class)->group(function()
 {
-    //select all
     Route::get("/commandes", "index")->name("commande.api.index");
-
-    //select by id
-    Route::get("/commandes/{id}", "show")->name("commande.api.show");
-
-    //Insert
+    Route::get("/commande/{id}", "show")->name("commande.api.show");
     Route::post("/commandes/add", "store")->name("commande.api.store");
-
-    //Update
     Route::post("/commandes/update", "edit")->name("commande.api.edit");
 });

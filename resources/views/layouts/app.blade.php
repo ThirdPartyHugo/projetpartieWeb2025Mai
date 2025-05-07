@@ -27,11 +27,14 @@
                 <a class="m-2 ml-4 mr-4 p-2" href="{{ route('produits') }} ">
                     <button class="rounded-full border-4 p-2 hover:border-sky-300 border-white justify-self-center w-full text-xl text-white">{{ __('Produits') }}</button>
                 </a>
-                <a class="m-2 ml-4 mr-4 p-2" href="{{ route('listCommandes') }} ">
+                <a class="m-2 ml-4 mr-4 p-2" href="{{ route('commande.index') }} ">
                     <button class="rounded-full border-4 p-2 hover:border-sky-300 border-white justify-self-center w-full text-xl text-white">{{ __('Commandes') }}</button>
                 </a>
                 <a class="m-2 ml-4 mr-4 p-2" href="{{ route('listEmployee') }} ">
                     <button class="rounded-full border-4 p-2 hover:border-sky-300 border-white justify-self-center w-full text-xl text-white">{{ __('Employés') }}</button>
+                </a>
+                <a class="m-2 ml-4 mr-4 p-2" href="{{ route('magasins') }} ">
+                    <button class="rounded-full border-4 p-2 hover:border-sky-300 border-white justify-self-center w-full text-xl text-white">{{ __('Magasins') }}</button>
                 </a>
             </aside>
             <div class="w-3/4">
