@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CommandeResource;
 use App\Models\Commande;
 use App\Models\CommandeProduits;
+use App\Models\ModePayement;
 use App\Models\ModePayementUserCommande;
 use Exception;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Illuminate\Database\QueryException;
 use App\Models\Produit;
 use App\Models\Statut;
 use App\Models\User;
+use Error;
 
 class CommandeController extends Controller
 {
@@ -69,21 +71,41 @@ class CommandeController extends Controller
     {
         $rawContent = $request->all();
 
-        
+        if(gettype($rawContent["payement_method"]) == "array")
+        {
+
+            $card = ModePayement::where("payement_no_carte", "LIKE", $rawContent["payement_method"]["no_carte"])
+                    ->first();
 
 
-            $insertCard = new ModePayementController;
-            $payementIndex = $insertCard->store($rawContent["payement_method"]);
-
-            if($payementIndex == -1)
+            //check si il existe
+            if(!is_null($card))
             {
-                return response()->json(['ERREUR' => 'Erreur à l\'insertion du mode de paiement lors de la création de la commande.'], 500);
+
+                if($card->payement_expiration != $rawContent["payement_method"]["expiration"])
+                {
+                    return response()->json(['ERREUR' => 'La date d\'expiration de la carte entrée ne correspond pas à celle enregistrée.'], 500);
+                }
+                else
+                {
+                    $rawContent["payement_method"] = $card->payement_id;
+                }
             }
             else
             {
-                $rawContent["payement_method"] = 1;
+                $insertCard = new ModePayementController;
+                $payementIndex = $insertCard->store($rawContent["payement_method"]);
+
+                if($payementIndex == -1)
+                {
+                    return response()->json(['ERREUR' => 'Erreur à l\'insertion du mode de paiement lors de la création de la commande.'], 500);
+                }
+                else
+                {
+                    $rawContent["payement_method"] = $payementIndex;
+                }
             }
-        
+        }
 
         $validation = Validator::make($rawContent,
         [
@@ -146,9 +168,9 @@ class CommandeController extends Controller
                     $commandeProduits->qte = $qte;
 
 
+
                     if(!$commandeProduits->save())
                     {
-                        
                         throw new Exception("La sauvegarde de la transaction avec le produit no " + $produit_id + "a échouée");
                     }
                 }
@@ -163,15 +185,12 @@ class CommandeController extends Controller
                     throw new Exception("La sauvegarde de la transaction avec la methode de paiement no " + $content["payement_method"] + "a échouée");
                 }
             }
-            catch(Exception $erreur) {
+            catch(QueryException $erreur)
+            {
+                return response()->json(['ERREUR' => 'Erreur critique à l\'insertion de la commande.\n
+                Transaction annulée.'], 500);
                 $this->cancelTransaction($id);
-                return response()->json([
-                    'ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion. Transaction annulée.',
-                    'DETAIL' => $erreur->getMessage(),
-                    'TRACE' => $erreur->getTraceAsString()
-                ], 500);
             }
-            
             catch(Exception $erreur)
             {
                 return response()->json(['ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion.\n
@@ -222,6 +241,11 @@ class CommandeController extends Controller
             }
             return new CommandeResource($commande);
         }
+    }
+
+    public function showByUser(Request $request)
+    {
+
     }
 
     /**

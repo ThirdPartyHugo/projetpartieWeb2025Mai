@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('telephone');
             $table->string('longitude');
             $table->string('latitude');
+            $table->string('image');
         });
     }
 

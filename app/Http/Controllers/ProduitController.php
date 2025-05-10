@@ -6,7 +6,7 @@ use App\Models\Produit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
-
+use App\Http\Resources\ProduitResource;
 
 class ProduitController extends Controller
 {
@@ -15,9 +15,16 @@ class ProduitController extends Controller
      */
     public function index(Request $request)
     {
-        return view('produit/produits', [
-            'produits' => Produit::All()
-        ]);
+        $produits = Produit::all();
+        if ($request->routeIs('produitsApi')) {
+            if (empty($produits))
+                return response()->json(['ERREUR' => 'Aucun produits.'], 400);
+            return ProduitResource::collection($produits);
+        }else{
+            return view('produit/produits', [
+                'produits' => $produits
+            ]);
+        }
     }
 
     /**
@@ -45,7 +52,7 @@ class ProduitController extends Controller
             'description.max' => 'Votre description de produit ne peut pas dépasser 250 caractères.',
             'prix.required' => 'Veuillez inscrire un prix pour le produit.',
             'prix.regex' => 'Le prix doit être un montant valide avec un point comme délimitateur.',
-            'image.required' => 'Veuillez entrer un nom de l\'image.',
+            'image.required' => 'Veuillez entrer le nom de l\'image.',
             'image.regex' => 'L\'image ne peut pas contenir d\'espace et doit contenir le nom du fichier, un point et l\'extension'
         ]);
         if ($validation->fails()) {
@@ -118,15 +125,18 @@ class ProduitController extends Controller
             'produit_site.regex' => 'Le site doit etre un chiffre ou un nombre'
         ]);
 
-        if ($validation->fails())
+        if ($validation->fails()){
             return back()->withErrors($validation->errors())->withInput();
+        }
         $contenuFormulaire = $validation->validated();
+
         $produit = Produit::find($contenuFormulaire['produit_id']);
         $produit->produit_prix = $contenuFormulaire['produit_prix'];
         $produit->produit_nom = $contenuFormulaire['produit_nom'];
         $produit->produit_description = $contenuFormulaire['produit_description'];
 
         $produit->save();
+
         return $this->index($request);
     }
 
@@ -149,14 +159,22 @@ class ProduitController extends Controller
         }
         return response()->json(['SUCCES' => $message], 200);
     }
+
     public function showFiltreId(Request $request, int $id)
     {
         $produits = Produit::where("produit_id", 'LIKE', '%' . $id . '%')->get("produit_id");
+        if(empty($produits)){
+            return response()->json(['ECHEC' => 'oupsi pas de produits'], 400);
+        }
         return response()->json($produits, 200);
     }
+
     public function showFiltreName(Request $request, string $name)
     {
         $produits = Produit::where("produit_nom",  'LIKE', '%' . $name . '%')->get("produit_id");
+        if(empty($produits)){
+            return response()->json(['ECHEC' => 'oupsi pas de produits'], 400);
+        }
         return response()->json($produits, 200);
     }
 }

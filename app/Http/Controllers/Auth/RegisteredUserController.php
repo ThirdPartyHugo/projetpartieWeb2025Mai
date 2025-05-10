@@ -32,18 +32,23 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
         if ($request->routeIs('inscriptionAPI')) {
-            $request->validate([
+            $validation = Validator::make($request->all(), [
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'regex:/^([a-zA-Z0-9_.]+)([@])([a-z]+)([.])([a-z]+)$/', 'unique:'.User::class],
+                'email' => ['required', 'string', 'email', 'max:255', 'regex:/^([a-zA-Z0-9_.]+)([@])([a-z]+)([.])([a-z]+)$/', 'unique:'.User::class],
                 'password' => ['required', 'confirmed', "regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+={}\[\]:;'<>,.?'\/'-]).{8,}/", Rules\Password::defaults()],
             ], [
                 'name.required' => 'Veuillez entrer un nom.',
                 'email.required' => 'Veuillez entrer un email.',
-                'email.regex' => 'L\'email entré n\'est pas dans un format valide.',
+                'email.regex' => 'L\'email entre n\'est pas dans un format valide.',
                 'password.required' => 'Veuillez entrer un mot de passe.',
-                'password.regex' => 'Le mot de passe entré n\'est pas dans un format valide. Vous devez avoir une lettre minuscule et majuscule, un chiffre et un symbole.',
+                'password.regex' => 'Le mot de passe entre n\'est pas dans un format valide. Vous devez avoir une lettre minuscule et majuscule, un chiffre et un symbole.',
                 'password.confirmed' => 'Le mot de passe de confirmation doit correspondre au mot de passe entré.',
             ]);
+
+            if ($validation->fails()) {
+                // un conteneur JSON avec un code HTTP 400.
+                return response()->json($validation->errors(), 400);
+            }
 
             try {
                 $user = User::create([
@@ -53,13 +58,13 @@ class RegisteredUserController extends Controller
                     'id_role' => 3,
                 ]);
 
-                event(new Registered($user));
+                //event(new Registered($user));
             } catch (QueryException $erreur) {
-                report($erreur);
-                return response()->json(['ERREUR' => 'L\'inscription n\'a pas fonctionné.'], 500);
+                //report($erreur);
+                return response()->json(['ERREUR' => 'L\'inscription n\'a pas fonctionne.'], 500);
             }
 
-            return response()->json(['SUCCÈS' => 'L\'inscription a bien fonctionné.'], 200);
+            return response()->json(['SUCCES' => 'L\'inscription a bien fonctionne.'], 200);
         }
 
         $validation = Validator::make($request->all(), [

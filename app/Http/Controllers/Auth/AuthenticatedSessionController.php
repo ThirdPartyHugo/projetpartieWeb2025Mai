@@ -43,13 +43,13 @@ class AuthenticatedSessionController extends Controller
                 RateLimiter::clear($request->throttleKey());
             } catch (QueryException $erreur) {
                 report($erreur);
-                return response()->json(['ERREUR' => 'La connexion n\'a pas fonctionné.'], 500);
+                return response()->json(['ERREUR' => 'La connexion n\'a pas fonctionne.'], 500);
             }
 
             $login = $request->all();
             $user = User::where('email', '=', $login['email'])->first();
 
-            return response()->json(['SUCCÈS' => $user->createToken('login')->plainTextToken], 200);
+            return response()->json(['SUCCES' => $user->createToken('login')->plainTextToken], 200);
         }
 
         $request->authenticate();

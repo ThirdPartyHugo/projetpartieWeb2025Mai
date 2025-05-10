@@ -13,5 +13,9 @@ class ModePayement extends Model
     protected $primaryKey = 'payement_id';
     public $timestamps = false;
 
-
+    protected $fillable =
+    [
+        "payement_no_carte",
+        "payement_expiration"
+    ];
 }

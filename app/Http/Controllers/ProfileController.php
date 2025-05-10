@@ -47,16 +47,16 @@ class ProfileController extends Controller
             try {
                 $validation = Validator::make($request->all(), [
                     'name' => ['required', 'string', 'max:255'],
-                    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'regex:/^([a-zA-Z0-9_.]+)([@])([a-z]+)([.])([a-z]+)$/', Rule::unique(User::class)->ignore($request->user()->id)],
+                    'email' => ['required', 'string', 'email', 'max:255', 'regex:/^([a-zA-Z0-9_.]+)([@])([a-z]+)([.])([a-z]+)$/', Rule::unique(User::class)->ignore($request->user()->id)],
                 ], [
                     'name.required' => 'Veuillez entrer un nom.',
                     'email.required' => 'Veuillez entrer un email.',
-                    'email.regex' => 'L\'email entré n\'est pas dans un format valide.',
+                    'email.regex' => 'L\'email entre n\'est pas dans un format valide.',
                 ]);
 
                 if ($validation->fails()) {
                     // un conteneur JSON avec un code HTTP 400.
-                    return back()->withErrors($validation->errors())->withInput();
+                    return response()->json($validation->errors(), 400);
                 }
 
                 $form = $validation->validated();
@@ -69,10 +69,10 @@ class ProfileController extends Controller
                 $user->save();
             } catch (QueryException $erreur) {
                 report($erreur);
-                return response()->json(['ERREUR' => 'La modification du profil n\'a pas fonctionné.'], 500);
+                return response()->json(['ERREUR' => 'La modification du profil n\'a pas fonctionne.'], 500);
             }
 
-            return response()->json(['SUCCÈS' => 'La modification du profil a bien fonctionné.'], 200);
+            return response()->json(['SUCCES' => 'La modification du profil a bien fonctionne.'], 200);
         }
 
         $validation = Validator::make($request->all(), [
@@ -149,10 +149,10 @@ class ProfileController extends Controller
                 User::destroy($id);
             } catch (QueryException $erreur) {
                 report($erreur);
-                return response()->json(['ERREUR' => 'La suppression du compte n\'a pas fonctionné.'], 500);
+                return response()->json(['ERREUR' => 'La suppression du compte n\'a pas fonctionne.'], 500);
             }
 
-            return response()->json(['SUCCÈS' => 'La suppression du compte a fonctionné.'], 200);
+            return response()->json(['SUCCES' => 'La suppression du compte a fonctionne.'], 200);
 
         }elseif($request->routeIs('deleteEmployee')){
 

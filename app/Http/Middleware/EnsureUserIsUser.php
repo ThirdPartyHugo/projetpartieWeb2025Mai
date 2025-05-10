@@ -40,7 +40,7 @@ class EnsureUserIsUser
             }
 
             if ($request->bearerToken() && $request->accepts('application/json')) {
-                return response()->json(['ERREUR' => 'Cette fonctionnalité n\'est disponible que pour les utilisateurs.'], 400);
+                return response()->json(['ERREUR' => 'Cette fonctionnalite n\'est disponible que pour les utilisateurs.'], 400);
             }
 
             // Si on se rend ici, c’est que l’utilisateur authentifié n’est pas un administrateur.
@@ -55,7 +55,7 @@ class EnsureUserIsUser
         }
 
         if ($request->bearerToken() && $request->accepts('application/json')) {
-            return response()->json(['ERREUR' => 'Cette fonctionnalité n\'est disponible que pour les utilisateurs.'], 400);
+            return response()->json(['ERREUR' => 'Cette fonctionnalite n\'est disponible que pour les utilisateurs.'], 400);
         }
 
         // Rendu ici, aucun utilisateur ne s’était authentifié ou encore l’utilisateur authentifié

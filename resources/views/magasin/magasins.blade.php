@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight w-1/3">
-            {{ __('Gestion des articles') }}
+            {{ __('Gestion des magasins') }}
         </h2>
     </x-slot>
     <div class="flex flex-row w-xl mr-20">
@@ -55,16 +55,20 @@
                     <td class="bg-blue-300 text-white p-2 border-sky-500 border-4">{{ $magasin->nom }}</td>
                     <td class="bg-blue-300 text-white p-2 border-sky-500 border-4">{{ $magasin->adresse }}</td>
                     <td class="bg-blue-300 text-white p-2 border-sky-500 border-4">{{ $magasin->telephone }}</td>
-                    <td><img class="h-6 " src="{{ asset('images/edit-icon.png') }}" alt="image"></td>
+                    <td><a href="{{route("modificationMagasin", $magasin->id)}}" ><img class="h-6 " src="{{ asset('images/edit-icon.png') }}" alt="image"></a></td>
                 </tr>
             @endforeach
         </table>
     </div>
-    <div class="flex flex-row ">
-        <button>{{"Retour vers Accueil"}}</button>
-        <div>
-            <button>{{"Ajouter"}}</button>
-            <button>{{"Supprimer"}}</button>
+    <div class="flex flex-row place-content-between mx-10 ">
+        <button class="w1/6 bg-sky-800 text-white p-3 px-4 rounded-lg place-self-center mt-4">{{"Retour vers Accueil"}}</button>
+        <div class="w-2/5 flex flex-row mt-4">
+            <form class="w-1/2  place-self-center mr-4" method="get" action="{{ route('ajouterMagasin') }}">
+                @csrf
+                <button class="w-full bg-sky-800 text-white p-3 px-4 rounded-lg">{{"Ajouter"}}</button>
+            </form>
+
+            <button class="w-1/2 bg-red-700 text-white p-3 px-4 rounded-lg place-self-center">{{"Supprimer"}}</button>
 
         </div>
     </div>

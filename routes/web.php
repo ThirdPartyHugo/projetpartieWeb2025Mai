@@ -41,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::controller(MagasinController::class)->group(function () {
             Route::get('/magasins', 'index')->name('magasins');
+            Route::get('/magasin/{id}/modification', 'edit')->name('modificationMagasin');
+            Route::post('/enregistrementMagasins', 'update')->name('enregistrementMagasin');
+            Route::get('/ajoutMagasin', 'create')->name("ajouterMagasin");
+            Route::post( '/magasins', 'store')->name('storeMagasin');
         });
     });
 });

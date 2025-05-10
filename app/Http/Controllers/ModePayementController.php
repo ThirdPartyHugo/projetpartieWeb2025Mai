@@ -56,7 +56,7 @@ class ModePayementController extends Controller
 
             if($modePayement->save())
             {
-                return $modePayement->id;
+                return $modePayement->payement_id;
             }
             else
             {

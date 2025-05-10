@@ -10,4 +10,6 @@ class Magasin extends Model
     protected $table = 'magasins';
     protected $primaryKey = 'id';
     public $timestamps = false;
+    protected $fillable = [ 'nom', 'adresse', 'image', 'tel'];
+
 }
