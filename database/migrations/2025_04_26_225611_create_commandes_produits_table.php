@@ -27,8 +27,8 @@ return new class extends Migration
 
         Schema::table("commandes_produits", function (Blueprint $table)
         {
-            $table->foreign("commande_id")->references("commande_id")->on("commandes")->onDelete("cascade");;
-            $table->foreign("produit_id")->references("produit_id")->on("produits")->onDelete("cascade");;
+            $table->foreign("commande_id")->references("commande_id")->on("commandes")->onDelete("cascade");
+            $table->foreign("produit_id")->references("produit_id")->on("produits")->onDelete("cascade");
 
         });
     }

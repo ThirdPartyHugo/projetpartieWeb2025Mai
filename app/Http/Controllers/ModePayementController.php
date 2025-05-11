@@ -116,7 +116,7 @@ class ModePayementController extends Controller
     {
         $validation = Validator::make($request->all(),
         [
-            "id" => "required",
+            "payement_id" => "required",
             "no_carte" => "required|regex:/^\d{16}$/",
             "expiration" => "required"
         ],
@@ -136,12 +136,27 @@ class ModePayementController extends Controller
             //c'est ok de l'enregistrer en clair ?
             $content = $validation->validated();
 
-            $modePayement = ModePayement::find($content["id"]);
+            $modePayement = ModePayement::find($content["paiement_id"]);
 
             $modePayement->payement_no_carte = $content["no_carte"];
             $modePayement->payement_expiration = $content["expiration"];
 
-            if($modePayement->save())
+
+            $saved = $modePayement->save();
+
+            if($request->routeIs("paiement.api.update"))
+            {
+                if($saved)
+                {
+                    return response()->json(['SUCCES' => 'La modification du mode de payement a bien fonctionnee.'], 400);
+                }
+                else
+                {
+                    return response()->json(['ERREUR' => 'Aucun mode de payement liee à ce user.'], 400);
+                }
+            }
+
+            if($saved)
             {
                 session()->flash("SUCCES", "La modification du mode de payement a bien fonctionnee");
             }
@@ -160,13 +175,56 @@ class ModePayementController extends Controller
     {
         $id = $request->input("id");
 
-        if(ModePayement::destroy($id))
+        $destroyed = ModePayement::destroy($id);
+
+        if($request->routeIs("paiement.api.destroy"))
+        {
+            if($destroyed)
+            {
+                return response()->json(['SUCCES' => 'La destruction du mode de payement a bien fonctionnee.'], 400);
+            }
+            else
+            {
+                return response()->json(['ERREUR' => "La destruction du mode de payement n'a pas fonctionnee."], 500);
+            }
+        }
+
+
+        if($destroyed)
+        {
+            return back()->with("SUCCES", "La destruction du mode de payement a bien fonctionnee.");
+        }
+
+        return back()->with("ERREUR", "La destruction du mode de payement n'a pas fonctionnee.");
+
+
+    }
+
+    public function delete(Request $request)
+    {
+        $modePayement = ModePayement::find($request->payement_id);
+
+        $modePayement->deleted = true;
+        $saved = $modePayement->save();
+
+        if($request->routeIs("paiement.api.delete"))
+        {
+            if($saved)
+            {
+                return response()->json(['SUCCES' => 'La suppression du mode de payement a bien fonctionnee.'], 400);
+            }
+            else
+            {
+                return response()->json(['ERREUR' => "La suppression du mode de payement n'a pas fonctionnee."], 500);
+            }
+
+        }
+        if($saved)
         {
             return back()->with("SUCCES", "La suppression du mode de payement a bien fonctionnee.");
         }
 
         return back()->with("ERREUR", "La suppression du mode de payement n'a pas fonctionnee.");
-
 
     }
 }

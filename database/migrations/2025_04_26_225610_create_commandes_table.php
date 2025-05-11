@@ -25,7 +25,7 @@ return new class extends Migration
 
         Schema::table("commandes", function (Blueprint $table)
         {
-            $table->foreign("statut_id")->references("statut_id")->on("statuts");
+            $table->foreign("statut_id")->references("statut_id")->on("statuts")->onDelete("cascade");
         });
     }
 

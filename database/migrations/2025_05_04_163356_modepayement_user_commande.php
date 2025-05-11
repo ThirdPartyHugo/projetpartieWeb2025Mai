@@ -26,9 +26,9 @@ return new class extends Migration
 
         Schema::table("payements_users_commandes", function (Blueprint $table)
         {
-            $table->foreign("commande_id")->references("commande_id")->on("commandes");
+            $table->foreign("commande_id")->references("commande_id")->on("commandes")->onDelete("cascade");
             $table->foreign("user_id")->references("id")->on("users");
-            $table->foreign("payement_id")->references("payement_id")->on("modes_payements");
+            $table->foreign("payement_id")->references("payement_id")->on("modes_payements")->onDelete("cascade");
         });
     }
 
