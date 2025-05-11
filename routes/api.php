@@ -4,7 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\MagasinController;
-
+use App\Http\Controllers\ModePayementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProduitController;
@@ -46,6 +46,14 @@ Route::controller(CommandeController::class)->group(function()
     Route::get("/commande/{id}", "show")->name("commande.api.show");
     Route::post("/commandes/add", "store")->name("commande.api.store");
     Route::post("/commandes/update", "edit")->name("commande.api.edit");
+    Route::post("/user/commandes", "showByUser")->name("commande.api.showByUser");
+});
+
+Route::controller(ModePayementController::class)->group(function()
+{
+    Route::post("/modepaiement/show", "show")->name("paiement.api.show");
+    Route::post("/modepaiement/showAll", "showByUser")->name("paiement.api.showByUser");
+
 });
 
 Route::controller(MagasinController::class)->group(function() {

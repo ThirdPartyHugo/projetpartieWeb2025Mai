@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ModePayement;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -42,8 +43,7 @@ class ModePayementController extends Controller
 
         if($validation->fails())
         {
-            //return back()->withErrors($validation->errors())->withInput();
-            return false;
+            return back()->withErrors($validation->errors())->withInput();
         }
         else
         {
@@ -68,9 +68,37 @@ class ModePayementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ModePayement $modePayement)
+    public function show(Request $request)
     {
-        //
+        $modepaiement = ModePayement::join("payements_users_commandes","modes_payements.payement_id", "=", "payements_users_commandes.payement_id")
+                                    ->where("payements_users_commandes.user_id", "=", $request->user_id)
+                                    ->where("modes_payements.payement_id", "=", $request->payement_id)
+                                    ->first();
+
+        if($request->routeIs("paiement.api.show"))
+        {
+            if (!$modepaiement)
+            {
+                return response()->json(['ERREUR' => 'Le mode de paiement demandé est introuvable.'], 400);
+            }
+            return response()->json(['SUCCES' => $modepaiement], 200);
+        }
+    }
+
+    public function showByUser(Request $request)
+    {
+        $listPayement = ModePayement::join("payements_users_commandes","modes_payements.payement_id", "=", "payements_users_commandes.payement_id")
+                        ->where("payements_users_commandes.user_id", "=", $request->user_id)
+                        ->get();
+
+        if($request->routeIs("paiement.api.showByUser"))
+        {
+            if(!isset($listPayement[1]))
+            {
+                return response()->json(['ERREUR' => 'Aucun mode de payement liee à ce user.'], 400);
+            }
+            return response()->json(['SUCCES' => $listPayement], 200);
+        }
     }
 
     /**
@@ -112,15 +140,14 @@ class ModePayementController extends Controller
 
             $modePayement->payement_no_carte = $content["no_carte"];
             $modePayement->payement_expiration = $content["expiration"];
-            $modePayement->payement_nip = $content["nip"];
 
             if($modePayement->save())
             {
-                session()->flash("succès", "La modification du mode de payement a bien fonctionnée");
+                session()->flash("SUCCES", "La modification du mode de payement a bien fonctionnee");
             }
             else
             {
-                session()->flash("erreur", "La modification du mode de payement n'a pas fonctionnée");
+                session()->flash("ERREUR", "La modification du mode de payement n'a pas fonctionnee");
             }
         }
     }
@@ -135,10 +162,10 @@ class ModePayementController extends Controller
 
         if(ModePayement::destroy($id))
         {
-            return back()->with("succès", "La suppression du mode de payement a bien fonctionnée.");
+            return back()->with("SUCCES", "La suppression du mode de payement a bien fonctionnee.");
         }
 
-        return back()->with("erreur", "La suppression du mode de payement n'a pas fonctionné.");
+        return back()->with("ERREUR", "La suppression du mode de payement n'a pas fonctionnee.");
 
 
     }

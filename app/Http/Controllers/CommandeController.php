@@ -13,8 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use App\Models\Produit;
 use App\Models\Statut;
-use App\Models\User;
-use Error;
+use Illuminate\Support\Facades\Auth;
 
 class CommandeController extends Controller
 {
@@ -106,16 +105,19 @@ class CommandeController extends Controller
                 }
             }
         }
+        elseif(is_null(ModePayement::find("payement_method")))
+        {
+            return response()->json(['ERREUR' => "L'ID du mode de payement entrée n'existe pas"], 400);
+        }
 
         $validation = Validator::make($rawContent,
         [
-            "user_id" => "required|numeric",
+            "user_id" => "required",
             "payement_method" => "required|numeric",
             "produits" => "required"
         ],
         [
-            "user_id.required" => "Un ID d'utilisateur est nécessaire",
-            "user_id.numeric" => "L'ID de l'utilisateur doit être numérique",
+            "user_id.required" => "L'ID de l'utilisateur est nécessaire",
             "payement_method.required" => "Le mode de paiement est nécessaire",
             "payement_method.numeric" => "Un ID du mode de paiment est nécessaire",
             "produits.required" => "Une liste de produits est nécessaire"
@@ -125,9 +127,10 @@ class CommandeController extends Controller
         {
             return response()->json(['ERREUR' => $validation->errors()], 400);
         }
-
         $content = $validation->validated();
 
+
+        $user_id = $content["user_id"];
 
         $commande = new Commande;
 
@@ -177,7 +180,7 @@ class CommandeController extends Controller
                 $payementUserCommande = new ModePayementUserCommande;
 
                 $payementUserCommande->commande_id = $id;
-                $payementUserCommande->user_id = $content["user_id"];
+                $payementUserCommande->user_id = $user_id;
                 $payementUserCommande->payement_id = $content["payement_method"];
 
                 if(!$payementUserCommande->save())
@@ -212,9 +215,9 @@ class CommandeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, int $commande_id)
+    public function show(Request $request)
     {
-        $commande = Commande::find($request->input($commande_id));
+        $commande = Commande::find($request->id);
 
         if(is_null($commande))
         {
@@ -239,13 +242,45 @@ class CommandeController extends Controller
             {
                 return response()->json(['ERREUR' => 'La commande demandée est introuvable.'], 400);
             }
-            return new CommandeResource($commande);
+            return response()->json(['SUCCES' => new CommandeResource($commande)], 200);
         }
     }
 
     public function showByUser(Request $request)
     {
 
+        $commandes = Commande::join("payements_users_commandes", "commandes.commande_id", "=", "payements_users_commandes.commande_id")
+                            ->where("payements_users_commandes.user_id", "=", $request->user_id)
+                            ->get();
+
+        if(is_null($commandes))
+        {
+            return abort(404);
+        }
+
+        if ($request->routeIs('commande.show'))
+        {
+            if (is_null($commandes))
+            {
+                return abort(404);
+            }
+
+            return view("commande/commande",
+            [
+                "commandes" => $commandes
+            ]);
+        }
+        else if ($request->routeIs('commande.api.showByUser'))
+        {
+            if (empty($commandes))
+            {
+                return abort(501);
+
+                return response()->json(['ERREUR' => 'La commande demandée est introuvable.'], 400);
+            }
+
+            return response()->json(['SUCCES' => CommandeResource::collection($commandes)], 200);
+        }
     }
 
     /**

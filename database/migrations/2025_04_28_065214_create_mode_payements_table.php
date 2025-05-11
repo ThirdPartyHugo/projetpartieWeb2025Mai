@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->string('payement_no_carte', 16);
             $table->dateTime('payement_expiration');
-
+            $table->boolean('deleted')->default(false);
         });
     }
 

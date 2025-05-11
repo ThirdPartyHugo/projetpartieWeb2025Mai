@@ -18,4 +18,9 @@ class ModePayement extends Model
         "payement_no_carte",
         "payement_expiration"
     ];
+
+    protected $casts =
+    [
+        'deleted' => 'boolean'
+    ];
 }
