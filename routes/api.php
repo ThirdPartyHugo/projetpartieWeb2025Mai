@@ -53,7 +53,7 @@ Route::controller(ModePayementController::class)->group(function()
 {
     Route::get("/modepaiement/show", "show")->name("paiement.api.show");
     Route::get("/modepaiement/showAll", "showByUser")->name("paiement.api.showByUser");
-    Route::post("/modepaiement/create", "store")->name("paiement.api.create");
+    Route::post("/modepaiement/store", "store")->name("paiement.api.store");
     Route::post("/modepaiement/update", "update")->name("paiement.api.update");
     Route::post("/modepaiement/delete", "delete")->name("paiement.api.delete");
     Route::post("/modepaiement/destroy", "destroy")->name("paiement.api.destroy");
