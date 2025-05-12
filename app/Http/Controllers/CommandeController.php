@@ -105,7 +105,7 @@ class CommandeController extends Controller
                 }
             }
         }
-        elseif(is_null(ModePayement::find("payement_method")))
+        elseif(is_null(ModePayement::find($rawContent["payement_method"])))
         {
             return response()->json(['ERREUR' => "L'ID du mode de payement entrée n'existe pas"], 400);
         }
