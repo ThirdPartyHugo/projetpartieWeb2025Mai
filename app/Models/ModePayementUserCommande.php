@@ -12,6 +12,8 @@ class ModePayementUserCommande extends Model
 
     protected $table = "payements_users_commandes";
     public $timestamps = false;
+    public $incrementing = false;
+    protected $primaryKey = null;
 
 
     public function commande(): BelongsTo
