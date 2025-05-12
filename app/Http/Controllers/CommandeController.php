@@ -190,8 +190,7 @@ class CommandeController extends Controller
             }
             catch(QueryException $erreur)
             {
-                return response()->json(['ERREUR' => 'Erreur critique à l\'insertion de la commande.\n
-                Transaction annulée.'], 500);
+                return response()->json(['ERREUR' => $erreur->getMessage()], 500);
                 $this->cancelTransaction($id);
             }
             catch(Exception $erreur)
