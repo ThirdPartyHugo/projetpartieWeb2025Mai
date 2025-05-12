@@ -71,7 +71,7 @@ class ModePayementController extends Controller
     public function show(Request $request)
     {
         $modepaiement = ModePayement::join("payements_users_commandes","modes_payements.payement_id", "=", "payements_users_commandes.payement_id")
-                                    ->first();
+                                    ->get();
 
         if($request->routeIs("paiement.api.show"))
         {
