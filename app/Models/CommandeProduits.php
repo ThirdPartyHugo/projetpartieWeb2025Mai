@@ -11,6 +11,8 @@ class CommandeProduits extends Model
     use HasFactory;
     protected $table = 'commandes_produits';
     public $timestamps = false;
+    public $incrementing = false;
+    protected $primaryKey = null;
 
     protected $fillable =
     [
