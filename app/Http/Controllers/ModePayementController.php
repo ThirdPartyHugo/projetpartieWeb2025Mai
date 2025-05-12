@@ -28,9 +28,9 @@ class ModePayementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store($params)
+    public function store(Request $request)
     {
-        $validation = Validator::make($params,
+        $validation = Validator::make($request->all(),
         [
             "no_carte" => "required|regex:/^\d{16}$/",
             "expiration" => "required"
