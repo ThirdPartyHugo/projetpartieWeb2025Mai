@@ -9,12 +9,12 @@
         <div class="flex flex-row w-xl mr-20">
             <div class="w-full flex flex-row m-5 ml-10">
                 <div class="bg-sky-800 w-5/6 flex justify-center items-center">
-                    <form class="w-4/6 my-5" method="get" action="{{ route('commande.index') }}">
+                    <form class="w-4/6 my-5" method="get" action="{{ route('commande.show') }}">
                         <label class = "text-white"for="searchCommande">Recherche d'une commande par ID</label>
                         <div class="flex flex-row">
-                            <select class="w-full" name="searchCommande" id="searchCommande">
+                            <select class="w-full" name="id" id="searchCommande">
                                 @foreach ($commandes as $element)
-                                    <option value={{ $element->commande->commande_id }}>{{ $element->commande->commande_id }}</option>
+                                    <option value={{$element->commande->commande_id}}>{{ $element->commande->commande_id }}</option>
                                 @endforeach
                             </select>
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-3">
@@ -26,17 +26,17 @@
                 </div>
             </div>
         </div>
-        <div class="bg-sky-500 w-xl mr-10 ml-10 w-9/10">
+        <div class="bg-sky-500 w-xl mr-10 ml-10 w-9/10 h-80 overflow-y-scroll">
                 <table class="m-6 w-3/4">
-                    <tr class="font-semibold text-lg w-full">
-                        <td class="bg-black text-white p-2 border">ID</td>
-                        <td class="bg-black text-white p-2 border">Etat</td>
-                        <td class="bg-black text-white p-2 border">Nom</td>
-                        <td class="bg-black text-white p-2 border">Total ($)</td>
-                        <td class="bg-blackp-2"></td>
-                        <td class="bg-blackp-2"></td>
-
-                    </tr>
+                    <thead>
+                        <tr class="font-semibold text-lg">
+                            <td class="bg-black text-white p-2 border">ID</td>
+                            <td class="bg-black text-white p-2 border">Etat</td>
+                            <td class="bg-black text-white p-2 border">Nom</td>
+                            <td class="bg-black text-white p-2 border">Total ($)</td>
+                        </tr>
+                    </thead>
+                    <tbody>
                 @foreach ($commandes as $element)
                         <tr>
                             <td class="p-2 border">{{ $element->commande->commande_id }}</td>
@@ -54,13 +54,14 @@
                             <td class="p-2 border">
                                 <form method="post" action="{{ route('commande.destroy') }}" class="grid place-content-center">
                                     @csrf
-                                    <button type="submit" name="commande_id" value="{{ $element->commande->commande_id }}" class="w-5">
+                                    <button type="submit" name="command_id" value="{{ $element->commande->commande_id }}" class="w-5">
                                         <img type="image" src="{{ asset('images/delete-icon.png') }}" alt="Supprimer une commande" />
                                     </button>
                                 </form>
                             </td>
                         </tr>
                     @endforeach
+                    </tbody>
                 </table>
         </div>
     </div>

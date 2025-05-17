@@ -11,6 +11,7 @@ class CommandeProduits extends Model
     use HasFactory;
     protected $table = 'commandes_produits';
     public $timestamps = false;
+
     public $incrementing = false;
     protected $primaryKey = null;
 
@@ -20,6 +21,7 @@ class CommandeProduits extends Model
         "produit_id",
         "qte"
     ];
+
 
     public function commande(): BelongsTo
     {

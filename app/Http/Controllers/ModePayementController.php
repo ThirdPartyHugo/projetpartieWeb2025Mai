@@ -28,33 +28,56 @@ class ModePayementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request) //can be an array or a Request
     {
-        $validation = Validator::make($request->all(),
+        $params = $request->all();
+
+        if(!$request->routeIs("paiement.api.store"))
+        {
+            $params = $request->payement_method;
+        }
+
+        $validation = Validator::make($params,
         [
             "no_carte" => "required|regex:/^\d{16}$/",
             "expiration" => "required"
         ],
         [
             "no_carte.regex" => "Veuillez entrer la carte au complet",
-            "no_carte.required" => "Veuillez indiquer une carte de crédit",
+            "no_carte.required" => "Veuillez indiquer une carte de credit",
             "expiration.required" => "Veuillez remplir le champ d'expiration",
         ]);
 
         if($validation->fails())
         {
-            return back()->withErrors($validation->errors())->withInput();
+            return abort(501, $validation->errors());
         }
         else
         {
+
             $content = $validation->validated();
 
             $modePayement = new ModePayement();
 
             $modePayement->payement_no_carte = $content["no_carte"];             //c'est ok de l'enregistrer en clair ?
             $modePayement->payement_expiration = $content["expiration"];
+            $saved = $modePayement->save();
 
-            if($modePayement->save())
+
+
+            if($request->routeIs("paiement.api.store"))
+            {
+                if($saved)
+                {
+                    return response()->json(['SUCCES' => 'L\'enregistrement du mode de payement a bien fonctionnee.'], 200);
+                }
+                else
+                {
+                    return response()->json(['ERREUR' => 'L\'enregistrement du mode de payement n\'a pas fonctionnee.'], 400);
+                }
+            }
+
+            if($saved)
             {
                 return $modePayement->payement_id;
             }
@@ -71,11 +94,13 @@ class ModePayementController extends Controller
     public function show(Request $request)
     {
         $modepaiement = ModePayement::join("payements_users_commandes","modes_payements.payement_id", "=", "payements_users_commandes.payement_id")
-                                    ->get();
+                                    ->where("payements_users_commandes.user_id", "=", $request->user_id)
+                                    ->where("modes_payements.payement_id", "=", $request->payement_id)
+                                    ->first();
 
         if($request->routeIs("paiement.api.show"))
         {
-            if (!$modepaiement)
+            if (is_null($modepaiement))
             {
                 return response()->json(['ERREUR' => 'Le mode de paiement demandé est introuvable.'], 400);
             }
@@ -87,11 +112,13 @@ class ModePayementController extends Controller
     {
         $listPayement = ModePayement::join("payements_users_commandes","modes_payements.payement_id", "=", "payements_users_commandes.payement_id")
                         ->where("payements_users_commandes.user_id", "=", $request->user_id)
+                        ->select("modes_payements.payement_id", "modes_payements.payement_no_carte", "modes_payements.payement_expiration", "modes_payements.deleted")
+                        ->distinct()
                         ->get();
 
         if($request->routeIs("paiement.api.showByUser"))
         {
-            if(!isset($listPayement[1]))
+            if(!isset($listPayement[0]))
             {
                 return response()->json(['ERREUR' => 'Aucun mode de payement liee à ce user.'], 400);
             }

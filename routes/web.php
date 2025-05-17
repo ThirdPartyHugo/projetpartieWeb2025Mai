@@ -57,7 +57,7 @@ Route::controller(ProfileController::class)->group(function () {
 Route::controller(CommandeController::class)->group(function ()
 {
     Route::get("/commandes", "index")->name("commande.index");
-    //Route::get("/commande/{id}","show")->name("commande.show");
+    Route::get("/commande","show")->name("commande.show");
     Route::get("/commande/edit/", "edit")->name("commande.edit");
     Route::post("/commande/update", "update")->name("commande.update");
     Route::post("/commande/delete", "destroy")->name("commande.destroy");

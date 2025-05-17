@@ -14,6 +14,8 @@ use Illuminate\Database\QueryException;
 use App\Models\Produit;
 use App\Models\Statut;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 
 class CommandeController extends Controller
 {
@@ -93,15 +95,15 @@ class CommandeController extends Controller
             else
             {
                 $insertCard = new ModePayementController;
-                $payementIndex = $insertCard->store($rawContent["payement_method"]);
+                $payementIndex = $insertCard->store($request);
 
-                if($payementIndex == -1)
+                if($payementIndex > 0)
                 {
-                    return response()->json(['ERREUR' => 'Erreur à l\'insertion du mode de paiement lors de la création de la commande.'], 500);
+                    $rawContent["payement_method"] = $payementIndex;
                 }
                 else
                 {
-                    $rawContent["payement_method"] = $payementIndex;
+                    return response()->json(['ERREUR' => 'Erreur à l\'insertion du mode de paiement lors de la création de la commande.'], 500);
                 }
             }
         }
@@ -190,12 +192,13 @@ class CommandeController extends Controller
             }
             catch(QueryException $erreur)
             {
-                return response()->json(['ERREUR' => $erreur->getMessage()], 500);
+                return response()->json(['ERREUR' => 'Erreur critique à l\'insertion de la commande.
+                Transaction annulée.'], 500);
                 $this->cancelTransaction($id);
             }
             catch(Exception $erreur)
             {
-                return response()->json(['ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion.\n
+                return response()->json(['ERREUR' => 'Erreur critique à la sauvegarde d\'une insertion.
                 Transaction annulée.'], 500);
 
                 $this->cancelTransaction($id);
@@ -230,9 +233,26 @@ class CommandeController extends Controller
                 return abort(404);
             }
 
+            $produits = CommandeProduits::where("commande_id", "=", $request->id)
+                        ->get();
+
+            $state = Statut::find($commande->statut_id);
+
+            $user = User::join("payements_users_commandes", "users.id","=","payements_users_commandes.user_id")
+                            ->where("payements_users_commandes.commande_id", "=", $request->id)
+                            ->first();
+
+            $modepayement = ModePayement::join("payements_users_commandes", "modes_payements.payement_id","=","payements_users_commandes.payement_id")
+                                        ->where("payements_users_commandes.commande_id", "=", $request->id)
+                                        ->first();
+
             return view("commande/commande",
             [
-                "commande" => $commande
+                "commande" => $commande,
+                "collection" => $produits,
+                "user" => $user,
+                "mode_payement" => $modepayement,
+                "state" => $state
             ]);
         }
         else if ($request->routeIs('commande.api.show'))
@@ -340,7 +360,7 @@ class CommandeController extends Controller
      */
     public function destroy(Request $request)
     {
-        $id = $request->input("id");
+        $id = $request->input("command_id");
 
         if(Commande::destroy($id))
         {
