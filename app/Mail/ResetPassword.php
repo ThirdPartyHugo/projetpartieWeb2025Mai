@@ -30,7 +30,7 @@ class ResetPassword extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address("walmart@gmail.ca", "Walmart inc."),
+            from: new Address("hpskate26@gmail.com", "Walmart inc."),
             subject: 'Réinitialisation du mot de passe',
             replyTo: $this->user->email,
         );
