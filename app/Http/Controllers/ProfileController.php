@@ -167,18 +167,26 @@ class ProfileController extends Controller
     }
 
     public function envoiCourriel(Request $request)
-    {
-        if ($request->routeIs('resetPasswordCourrielAPI')) {
-            try {
-                $user = User::find($request->user()->id);
+{
+    if ($request->routeIs('resetPasswordCourrielAPI')) {
+        try {
+            $user = $request->user();
 
-                Mail::to($user->email)->send(new ResetPassword($user));
-            } catch (QueryException $erreur) {
-                report($erreur);
-                return response()->json(['ERREUR' => 'L\'envoi du courriel pour réinitialisé le mot de passe n\'a pas fonctionné.'], 500);
+            if (!$user || !$user->email) {
+                return response()->json(['ERREUR' => 'Aucun utilisateur authentifié ou courriel manquant.'], 400);
             }
+
+            Mail::to($user->email)->send(new ResetPassword($user));
+
+            return response()->json(['SUCCES' => 'Courriel envoyé avec succès.']);
+        } catch (QueryException $erreur) {
+            report($erreur);
+            return response()->json(['ERREUR' => 'L\'envoi du courriel pour réinitialiser le mot de passe a échoué.'], 500);
         }
     }
+
+    return response()->json(['ERREUR' => 'Route invalide.'], 404);
+}
 
     public function formReset($id): View
     {
