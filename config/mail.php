@@ -39,8 +39,7 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
-            'url' => "smtp.gmail.com",
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'host' => env('MAIL_HOST', 'smtp.gmail.com'),
             'port' => env('MAIL_PORT', 587),
             'username' => "hpskate26@gmail.com",
